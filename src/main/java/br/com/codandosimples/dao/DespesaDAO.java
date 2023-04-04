@@ -16,6 +16,12 @@ import java.util.Optional;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class DespesaDAO implements IDespesaDAO {
+    
+    private final Connection connection;
+
+    public DespesaDAO(Connection connection) {
+        this.connection = connection;
+    }
 
     @Override
     public Despesa save(Despesa despesa) {
@@ -66,7 +72,17 @@ public class DespesaDAO implements IDespesaDAO {
 
     @Override
     public void delete(Long id) {
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sql = "DELETE FROM Despesas WHERE id = ?;";
 
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setLong(1, id);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
